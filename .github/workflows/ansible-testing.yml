@@ -3,10 +3,6 @@ name: Testing
 on:  # yamllint disable-line rule:truthy
   workflow_call:
     inputs:
-      matrix:
-        type: string
-        required: false
-        default: ""
       dists:
         type: string
         required: false
