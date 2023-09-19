@@ -6,6 +6,7 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   bump-version:
+    name: Bump Version
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,7 +27,8 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
           generateReleaseNotes: true
 
-  release:
+  trigger-galaxy:
+    name: Trigger Galaxy Import
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
