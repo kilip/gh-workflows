@@ -24,11 +24,15 @@ jobs:
       - name: Generates build matrix
         id: generate_matrix
         run: |-
-          IFS=", "
-          read -a DISTS <<< "${{ inputs.dists }}"
+          declare -a dists=()
 
-          DISTS="$(jo -a ${DISTS[*]})"
-          output="{\"os\": $DISTS }"
+          for i in $(echo "ubuntu-22.04, debian-12" | tr "," " ")
+          do
+            dists+=($i)
+          done
+
+          JO="$(jo -a ${dists[*]})"
+          output="{\"os\": $JO }"
           echo "matrix=${output}" >> $GITHUB_OUTPUT
 
       - name: Set up Python 3.
