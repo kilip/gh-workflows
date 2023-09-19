@@ -5,15 +5,32 @@ on:  # yamllint disable-line rule:truthy
     inputs:
       matrix:
         type: string
-        required: true
+        required: false
+        default: ""
+      dists:
+        type: string
+        required: false
+        default: "ubuntu-12.04"
 
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate_matrix.outputs.matrix }}
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v3
+
+      - name: Generates build matrix
+        id: generate_matrix
+        run: |-
+          IFS=", "
+          read -a DISTS <<< "${{ inputs.dists }}"
+
+          DISTS="$(jo -a ${DISTS[*]})"
+          output="{\"os\": $DISTS }"
+          echo "matrix=${output}" >>> $GITHUB_OUTPUT
 
       - name: Set up Python 3.
         uses: actions/setup-python@v3
@@ -34,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(inputs.matrix) }}
+      matrix: ${{ fromJson(needs.lint.outputs.matrix) }}
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v3
