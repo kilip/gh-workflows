@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
       matrix:
         type: string
         required: true
-        default: "./matrix.json"
+
 jobs:
   lint:
     name: Lint
@@ -28,33 +28,16 @@ jobs:
         run: |
           yamllint .
 
-  configure-matrix:
-    needs: lint
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-      - name: Set matrix data
-        id: set-matrix
-        run: |-
-          echo "matrix=$(jq -c . < ${{ inputs.matrix }})" >> $GITHUB_OUTPUT
-
-
   molecule:
     name: Molecule
-    needs: configure-matrix
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.configure-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(inputs.matrix) }}
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v3
-        # with:
-        #   path: kilip.project_name
 
       - name: Set up Python 3.
         uses: actions/setup-python@v3
