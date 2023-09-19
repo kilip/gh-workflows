@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   bump-version:
     name: Bump Version
-    if: ${{ !contains(github.event.commits[0].message, 'initial commit') }}
+    if: ${{ !contains(github.event.commits[0].message, 'Initial commit') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,7 +30,7 @@ jobs:
 
   trigger-galaxy:
     name: Trigger Galaxy Import
-    if: ${{ !contains(github.event.commits[0].message, 'initial commit') }}
+    if: ${{ !contains(github.event.commits[0].message, 'Initial commit') }}
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
