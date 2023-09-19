@@ -29,7 +29,7 @@ jobs:
 
           DISTS="$(jo -a ${DISTS[*]})"
           output="{\"os\": $DISTS }"
-          echo "matrix=${output}" >>> $GITHUB_OUTPUT
+          echo "matrix=${output}" >> $GITHUB_OUTPUT
 
       - name: Set up Python 3.
         uses: actions/setup-python@v3
