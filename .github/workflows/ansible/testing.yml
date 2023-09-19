@@ -1,0 +1,75 @@
+---
+name: Testing
+on:  # yamllint disable-line rule:truthy
+  workflow_call:
+    inputs:
+      matrix:
+        type: string
+        required: true
+        default: "./matrix.json"
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          cache: pip
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint
+
+      - name: Lint code.
+        run: |
+          yamllint .
+
+  configure-matrix:
+    needs: lint
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Set matrix data
+        id: set-matrix
+        run: |-
+          echo "matrix=$(jq -c . < ${{ inputs.matrix }})" >> $GITHUB_OUTPUT
+
+
+  molecule:
+    name: Molecule
+    needs: configure-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.configure-matrix.outputs.matrix) }}
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+        # with:
+        #   path: kilip.project_name
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install test dependencies.
+        run:
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Molecule tests.
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DIST: ${{ matrix.os }}
