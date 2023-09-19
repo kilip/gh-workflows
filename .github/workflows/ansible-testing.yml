@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
       dists:
         type: string
         required: false
-        default: "ubuntu-12.04"
+        default: "ubuntu-22.04"
 
 jobs:
   lint:
@@ -25,7 +25,7 @@ jobs:
         id: generate_matrix
         run: |-
           IFS=", "
-          read -a DISTS <<< "${{ inputs.dists }}"
+          read -a DISTS << "${{ inputs.dists }}"
 
           DISTS="$(jo -a ${DISTS[*]})"
           output="{\"os\": $DISTS }"
