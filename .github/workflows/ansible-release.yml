@@ -30,6 +30,7 @@ jobs:
 
   trigger-galaxy:
     name: Trigger Galaxy Import
+    if: ${{ !contains(github.event.head_commit.message, 'initial commit') }}
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
